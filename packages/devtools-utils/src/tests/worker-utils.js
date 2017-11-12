@@ -103,7 +103,7 @@ describe("worker utils", () => {
 });
 
 it("streams a task", async () => {
-  jest.useRealTimers();
+  jest.useFakeTimers();
 
   const postMessageMock = jest.fn();
 
@@ -114,10 +114,10 @@ it("streams a task", async () => {
   function makeTasks() {
     return [
       {
-        callback: () => new Promise(resolve => setTimeout(() => resolve(1), 50))
+        callback: () => new Promise(resolve => resolve(1))
       },
       {
-        callback: () => new Promise(resolve => setTimeout(() => resolve(2), 50))
+        callback: () => new Promise(resolve => resolve(2))
       }
     ];
   }
@@ -130,6 +130,7 @@ it("streams a task", async () => {
 
   const id = 1;
   const task = workerHandler({ data: { id, method: "makeTasks", args: [] } });
+  jest.runAllTimers();
   await task;
 
   expect(postMessageMock.mock.calls.length).toBe(4);
